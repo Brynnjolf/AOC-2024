@@ -32,8 +32,8 @@ int main() {
         std::pair<size_t,size_t> a, b; // new Antinodes
         int dy = positions[j].first - positions[i].first;
         int dx = positions[j].second - positions[i].second;
-        a = { positions[j].first - 2*dy, positions[j].second - 2*dx };
-        b = { positions[i].first + 2*dy, positions[i].second + 2*dx };
+        a = { positions[i].first - dy, positions[i].second - dx };
+        b = { positions[j].first + dy, positions[j].second + dx };
         if(a.first < city.size() && a.second < city[i].size()) {
           antinodePositions.insert(a);
         }
@@ -44,6 +44,10 @@ int main() {
     }
   }
 
+
+  for(auto& el : antinodePositions) {
+    city[el.first][el.second] = '#';
+  }
 
   std::cout << antinodePositions.size() << std::endl;
 

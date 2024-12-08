@@ -1,55 +1,51 @@
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <vector>
 #include <algorithm>
-
-long concatenate(long left, long right) {
-  try {
-    std::string str = std::to_string(left);
-    str += std::to_string(right);
-    return std::stol(str);
-  } catch (std::out_of_range& e) {
-    return -1; // if it's too long, it can't be right. return junk.
-  }
-}
-
-bool calculate(long target, long result, size_t pos, std::vector<long>& expr) {
-  if(target == result && pos == expr.size()-1) {
-    return true;
-  }
-
-  if(pos >= expr.size()) {
-    return false;
-  }
-
-  if(calculate(target, result + expr[pos+1], pos+1, expr) || calculate(target, result * expr[pos+1], pos+1, expr) || calculate(target, concatenate(result, expr[pos+1]), pos+1, expr)) {
-    return true;
-  }
-
-  return false;
-}
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
 
 int main() {
 
-  size_t count = 0;
-
   std::fstream fs{"input.txt"};
+  std::vector<std::string> city;
   for(std::string line; std::getline(fs, line);) {
-    line.erase(std::remove(line.begin(), line.end(), ':'), line.end());
-
-    std::vector<long> expr;
-    std::stringstream ss{line};
-    for(std::string tok; std::getline(ss, tok, ' ');) {
-      expr.push_back(std::stol(tok));
-    }
-    if(calculate(expr[0], expr[1], 1, expr)) {
-      count += expr[0];
-    }
-
-
+    city.push_back(line);
   }
-  std::cout << count << std::endl;
+
+  std::map<char, std::vector<std::pair<size_t, size_t>>> satellitePositions = {};
+  std::set<std::pair<size_t,size_t>> antinodePositions = {};
+
+
+  for(size_t i = 0; i < city.size(); ++i) {
+    for(size_t j = 0; j < city[i].size(); ++j) {
+      if(city[i][j] != '.') {
+        satellitePositions[city[i][j]].push_back({ i, j });
+      }
+    }
+  }
+
+  for(const auto& [satellite, positions] : satellitePositions) {
+    for(size_t i = 0; i < positions.size(); ++i) {
+      for(size_t j = i + 1; j < positions.size(); ++j) {
+        std::pair<size_t,size_t> a, b; // new Antinodes
+        int dy = positions[j].first - positions[i].first;
+        int dx = positions[j].second - positions[i].second;
+        a = { positions[j].first - 2*dy, positions[j].second - 2*dx };
+        b = { positions[i].first + 2*dy, positions[i].second + 2*dx };
+        if(a.first < city.size() && a.second < city[i].size()) {
+          antinodePositions.insert(a);
+        }
+        if(b.first < city.size() && b.second < city[i].size()) {
+          antinodePositions.insert(b);
+        }
+      }
+    }
+  }
+
+
+  std::cout << antinodePositions.size() << std::endl;
 
   return 0;
 }

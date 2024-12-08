@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 
+
 long concatenate(long left, long right) {
   try {
     std::string str = std::to_string(left);
@@ -43,12 +44,12 @@ int main() {
     for(std::string tok; std::getline(ss, tok, ' ');) {
       expr.push_back(std::stol(tok));
     }
+
     if(calculate(expr[0], expr[1], 1, expr)) {
       count += expr[0];
     }
-
-
   }
+
   std::cout << count << std::endl;
 
   return 0;
